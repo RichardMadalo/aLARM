@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import { signOut } from "next-auth/react";
 
 type Account = {
   pairingKey: string;
@@ -51,27 +52,17 @@ export default function Dashboard() {
   const [form, setForm] = useState<Partial<Account>>({});
   const [saving, setSaving] = useState(false);
 
-  const load = useCallback(async (key: string) => {
-    const res = await fetch(`/api/account?key=${key}`);
+  const load = useCallback(async () => {
+    const res = await fetch("/api/account");
     if (res.ok) {
       const data = await res.json();
       setAccount(data);
     }
   }, []);
 
-  // bootstrap: get or create a pairing key
   useEffect(() => {
     (async () => {
-      let key = localStorage.getItem("alarm_pairing_key");
-      if (!key) {
-        const res = await fetch("/api/account", { method: "POST" });
-        const data = await res.json();
-        key = data.pairingKey;
-        localStorage.setItem("alarm_pairing_key", key!);
-        setAccount(data);
-      } else {
-        await load(key);
-      }
+      await load();
       setLoading(false);
     })();
   }, [load]);
@@ -79,7 +70,7 @@ export default function Dashboard() {
   // poll every 4s
   useEffect(() => {
     if (!account) return;
-    const id = setInterval(() => load(account.pairingKey), 4000);
+    const id = setInterval(() => load(), 4000);
     return () => clearInterval(id);
   }, [account, load]);
 
@@ -93,7 +84,7 @@ export default function Dashboard() {
     const res = await fetch("/api/account", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ pairingKey: account.pairingKey, ...form }),
+      body: JSON.stringify(form),
     });
     if (res.ok) {
       const data = await res.json();
@@ -108,7 +99,7 @@ export default function Dashboard() {
     const res = await fetch("/api/account", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ pairingKey: account.pairingKey, manualLock: !account.manualLock }),
+      body: JSON.stringify({ manualLock: !account.manualLock }),
     });
     if (res.ok) setAccount(await res.json());
   }
@@ -145,7 +136,10 @@ export default function Dashboard() {
           <h1 style={{ margin: 0, fontSize: 22, letterSpacing: 1 }}>aLARM</h1>
           <p style={{ margin: "2px 0 0", color: "#888", fontSize: 13 }}>A Live Account Risk Manager</p>
         </div>
-        <button onClick={() => setShowSettings(true)} style={btnStyle("#2c3e50")}>Settings</button>
+        <div style={{ display: "flex", gap: 8 }}>
+          <button onClick={() => setShowSettings(true)} style={btnStyle("#2c3e50")}>Settings</button>
+          <button onClick={() => signOut({ callbackUrl: "/login" })} style={btnStyle("#2c3e50")}>Log out</button>
+        </div>
       </div>
 
       {notPaired && (

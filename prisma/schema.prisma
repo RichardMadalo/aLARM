@@ -7,10 +7,22 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+
+  riskAccount RiskAccount?
+}
+
 model RiskAccount {
   id          String   @id @default(cuid())
   pairingKey  String   @unique @default(cuid())
   label       String   @default("My Trading Account")
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   // ---- settings, edited from the website, pulled by the EA ----
   dailyLimitType     String  @default("percent") // "percent" | "money"
