@@ -132,10 +132,8 @@ export default function Dashboard() {
   return (
     <div style={{ maxWidth: 720, margin: "0 auto", padding: "32px 20px" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
-        <div>
-          <h1 style={{ margin: 0, fontSize: 22, letterSpacing: 1 }}>aLARM</h1>
-          <p style={{ margin: "2px 0 0", color: "#888", fontSize: 13 }}>A Live Account Risk Manager</p>
-        </div>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/logo.svg" alt="aLARM" style={{ height: 28 }} />
         <div style={{ display: "flex", gap: 8 }}>
           <button onClick={() => setShowSettings(true)} style={btnStyle("#2c3e50")}>Settings</button>
           <button onClick={() => signOut({ callbackUrl: "/login" })} style={btnStyle("#2c3e50")}>Log out</button>

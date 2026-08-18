@@ -21,7 +21,8 @@ export function AuthCard({ title, children }: { title: string; children: React.R
   return (
     <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
       <div style={{ background: CARD_BG, border: `1px solid ${BORDER}`, borderRadius: 12, padding: 28, width: "100%", maxWidth: 360 }}>
-        <h1 style={{ margin: "0 0 4px", fontSize: 20, letterSpacing: 1 }}>aLARM</h1>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/logo.svg" alt="aLARM" style={{ height: 26, marginBottom: 16 }} />
         <p style={{ margin: "0 0 20px", color: "#888", fontSize: 13 }}>{title}</p>
         {children}
       </div>
