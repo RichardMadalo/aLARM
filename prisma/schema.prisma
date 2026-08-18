@@ -1,0 +1,41 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model RiskAccount {
+  id          String   @id @default(cuid())
+  pairingKey  String   @unique @default(cuid())
+  label       String   @default("My Trading Account")
+
+  // ---- settings, edited from the website, pulled by the EA ----
+  dailyLimitType     String  @default("percent") // "percent" | "money"
+  dailyLossLimit     Float   @default(3)
+  dailyProfitTarget  Float   @default(5)
+  weeklyLimitType    String  @default("percent")
+  weeklyLossLimit    Float   @default(8)
+  weeklyProfitTarget Float   @default(12)
+  autoCloseOnBreach  Boolean @default(true)
+  blockNewTrades     Boolean @default(true)
+  manualLock         Boolean @default(false) // trader-triggered kill switch from the website
+
+  // ---- live state, pushed by the EA ----
+  balance      Float?
+  equity       Float?
+  dailyPL      Float?
+  weeklyPL     Float?
+  dailyLocked  Boolean  @default(false)
+  weeklyLocked Boolean  @default(false)
+  lockReason   String?
+  accountLogin String?
+  broker       String?
+  currency     String?
+  lastSyncAt   DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
