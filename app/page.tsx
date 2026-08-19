@@ -253,6 +253,14 @@ function SettingsModal({ form, setForm, onCancel, onSave, saving }: {
       <div style={{ background: "#15161d", border: `1px solid ${BORDER}`, borderRadius: 12, padding: 24, width: "100%", maxWidth: 420, maxHeight: "88vh", overflowY: "auto" }}>
         <h2 style={{ marginTop: 0, fontSize: 16 }}>Risk Settings</h2>
 
+        {form.pairingKey && (
+          <Field label="Pairing key (for the EA's InpPairingKey input)">
+            <div style={{ ...inputStyle, fontFamily: "monospace", wordBreak: "break-all", userSelect: "all" }}>
+              {form.pairingKey}
+            </div>
+          </Field>
+        )}
+
         <Field label="Daily loss limit type">
           <select value={form.dailyLimitType} onChange={(e) => setForm({ ...form, dailyLimitType: e.target.value })} style={inputStyle}>
             <option value="percent">% of balance</option>
