@@ -34,6 +34,8 @@ export async function PATCH(req: NextRequest) {
     "autoCloseOnBreach",
     "blockNewTrades",
     "manualLock",
+    "unlockDailyRequested",
+    "unlockWeeklyRequested",
   ];
   const data: Record<string, unknown> = {};
   for (const k of allowed) if (k in body) data[k] = body[k];

@@ -15,6 +15,8 @@ type Account = {
   autoCloseOnBreach: boolean;
   blockNewTrades: boolean;
   manualLock: boolean;
+  unlockDailyRequested: boolean;
+  unlockWeeklyRequested: boolean;
   balance: number | null;
   equity: number | null;
   dailyPL: number | null;
@@ -94,12 +96,18 @@ export default function Dashboard() {
     setSaving(false);
   }
 
-  async function toggleManualLock() {
+  async function toggleLock() {
     if (!account) return;
+    // Locked can mean manualLock, or a breach lock the EA set on its own (dailyLocked/
+    // weeklyLocked) - only the EA can actually clear those, so ask it to via a request
+    // flag it picks up on its next sync, instead of just flipping manualLock off.
+    const body = locked
+      ? { manualLock: false, unlockDailyRequested: true, unlockWeeklyRequested: true }
+      : { manualLock: true };
     const res = await fetch("/api/account", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ manualLock: !account.manualLock }),
+      body: JSON.stringify(body),
     });
     if (res.ok) setAccount(await res.json());
   }
@@ -160,11 +168,16 @@ export default function Dashboard() {
       <PLCard title="Weekly P&L" pl={wPL} loss={wLoss} target={wTarget} frac={wFrac} locked={account.weeklyLocked} />
 
       <button
-        onClick={toggleManualLock}
-        style={{ ...btnStyle(account.manualLock ? OK : DANGER), width: "100%", marginTop: 16, padding: "14px 0", fontSize: 14, fontWeight: 700 }}
+        onClick={toggleLock}
+        style={{ ...btnStyle(locked ? OK : DANGER), width: "100%", marginTop: 16, padding: "14px 0", fontSize: 14, fontWeight: 700 }}
       >
-        {account.manualLock ? "UNLOCK ACCOUNT" : "EMERGENCY LOCK ACCOUNT"}
+        {locked ? "UNLOCK ACCOUNT" : "EMERGENCY LOCK ACCOUNT"}
       </button>
+      {(account.unlockDailyRequested || account.unlockWeeklyRequested) && (
+        <p style={{ fontSize: 11, color: "#f1c40f", marginTop: 8, textAlign: "center" }}>
+          Unlock requested — takes effect on the EA&apos;s next sync (~{`10s`}).
+        </p>
+      )}
 
       <p style={{ fontSize: 11, color: "#666", marginTop: 24, textAlign: "center" }}>
         {account.accountLogin ? `MT5 #${account.accountLogin} · ${account.broker ?? ""}` : "Waiting for EA to sync…"}

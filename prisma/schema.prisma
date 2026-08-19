@@ -35,6 +35,11 @@ model RiskAccount {
   blockNewTrades     Boolean @default(true)
   manualLock         Boolean @default(false) // trader-triggered kill switch from the website
 
+  // requests from the website to clear an EA-side breach lock; the EA reads these
+  // on its next sync, clears its local lock if still true, then echoes back false
+  unlockDailyRequested  Boolean @default(false)
+  unlockWeeklyRequested Boolean @default(false)
+
   // ---- live state, pushed by the EA ----
   balance      Float?
   equity       Float?

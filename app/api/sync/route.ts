@@ -24,6 +24,10 @@ export async function POST(req: NextRequest) {
       accountLogin: body.accountLogin ?? existing.accountLogin,
       broker: body.broker ?? existing.broker,
       currency: body.currency ?? existing.currency,
+      // The EA only sends these to ack that it consumed a pending unlock request
+      // (i.e. clear it back to false) - it never sets them to true itself.
+      unlockDailyRequested: body.unlockDailyRequested ?? existing.unlockDailyRequested,
+      unlockWeeklyRequested: body.unlockWeeklyRequested ?? existing.unlockWeeklyRequested,
       lastSyncAt: new Date(),
     },
   });
@@ -39,5 +43,7 @@ export async function POST(req: NextRequest) {
     autoCloseOnBreach: account.autoCloseOnBreach,
     blockNewTrades: account.blockNewTrades,
     manualLock: account.manualLock,
+    unlockDailyRequested: account.unlockDailyRequested,
+    unlockWeeklyRequested: account.unlockWeeklyRequested,
   });
 }
